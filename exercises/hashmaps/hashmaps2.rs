@@ -51,6 +51,7 @@ mod tests {
     // Don't modify this function!
     fn get_fruit_basket() -> HashMap<Fruit, u32> {
         let mut basket = HashMap::<Fruit, u32>::new();
+        
         basket.insert(Fruit::Apple, 4);
         basket.insert(Fruit::Mango, 2);
         basket.insert(Fruit::Lychee, 5);
