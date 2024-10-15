@@ -7,9 +7,8 @@
 // Execute `rustlings hint threads2` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -18,14 +17,17 @@ struct JobStatus {
 }
 
 fn main() {
-    let status = Arc::new(JobStatus { jobs_completed: 0 });
+    //这个错误是因为 Arc 类型是不可变引用计数类型，不能直接进行赋值修改内部的值。
+    //为了解决这个问题，可以使用 Arc 和 Mutex（互斥锁）结合的方式来实现多线程安全的可变访问。
+    let status = Arc::new(Mutex::new(JobStatus { jobs_completed: 0 }));
     let mut handles = vec![];
     for _ in 0..10 {
         let status_shared = Arc::clone(&status);
         let handle = thread::spawn(move || {
             thread::sleep(Duration::from_millis(250));
             // TODO: You must take an action before you update a shared value
-            status_shared.jobs_completed += 1;
+            let mut num = status_shared.lock().unwrap();
+            num.jobs_completed += 1;
         });
         handles.push(handle);
     }
@@ -34,6 +36,6 @@ fn main() {
         // TODO: Print the value of the JobStatus.jobs_completed. Did you notice
         // anything interesting in the output? Do you have to 'join' on all the
         // handles?
-        println!("jobs completed {}", ???);
+        println!("jobs completed {}", status.lock().unwrap().jobs_completed);
     }
 }
