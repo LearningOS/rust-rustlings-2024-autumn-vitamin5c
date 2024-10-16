@@ -27,7 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -41,6 +40,15 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let red = tuple.0.try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let green = tuple.1.try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let blue = tuple.2.try_into().map_err(|_| IntoColorError::IntConversion)?;
+
+        if red > 255 || green > 255 || blue > 255 {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        Ok(Color { red, green, blue })
     }
 }
 
@@ -48,6 +56,19 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        if arr.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+
+        let red = arr[0].try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let green = arr[1].try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let blue = arr[2].try_into().map_err(|_| IntoColorError::IntConversion)?;
+
+        if red > 255 || green > 255 || blue > 255 {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        Ok(Color { red, green, blue })
     }
 }
 
@@ -55,6 +76,18 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        let red = slice[0].try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let green = slice[1].try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let blue = slice[2].try_into().map_err(|_| IntoColorError::IntConversion)?;
+
+        if red > 255 || green > 255 || blue > 255 {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        Ok(Color { red, green, blue })
     }
 }
 
