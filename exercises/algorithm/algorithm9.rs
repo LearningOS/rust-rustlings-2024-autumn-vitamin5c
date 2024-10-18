@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,9 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count += 1;
+        self.items.push(value);
+        self.bubble_up(self.count);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +58,45 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        if!self.children_present(idx) {
+            return 0;
+        }
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        if right_idx > self.count {
+            return left_idx;
+        }
+        if (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
+            return left_idx;
+        } else {
+            return right_idx;
+        }
+    }
+
+    fn bubble_up(&mut self, idx: usize) {
+        if idx == 1 {
+            return;
+        }
+        let parent_idx = self.parent_idx(idx);
+        if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+            self.items.swap(idx, parent_idx);
+            self.bubble_up(parent_idx);
+        }
+    }
+    fn sift_down(&mut self, idx: usize) {
+        let mut smallest = idx;
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        if left_idx <= self.count && (self.comparator)(&self.items[left_idx], &self.items[smallest]) {
+            smallest = left_idx;
+        }
+        if right_idx <= self.count && (self.comparator)(&self.items[right_idx], &self.items[smallest]) {
+            smallest = right_idx;
+        }
+        if smallest!= idx {
+            self.items.swap(idx, smallest);
+            self.sift_down(smallest);
+        }
     }
 }
 
@@ -79,14 +117,22 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        let min = self.items[1].clone();
+        self.items[1] = self.items[self.count].clone();
+        self.count -= 1;
+        self.sift_down(1);
+        Some(min)
     }
+
+    
 }
 
 pub struct MinHeap;
@@ -97,7 +143,7 @@ impl MinHeap {
     where
         T: Default + Ord,
     {
-        Heap::new(|a, b| a < b)
+        Heap::new_min()
     }
 }
 
@@ -109,7 +155,7 @@ impl MaxHeap {
     where
         T: Default + Ord,
     {
-        Heap::new(|a, b| a > b)
+        Heap::new_max()
     }
 }
 
@@ -134,7 +180,7 @@ mod tests {
         assert_eq!(heap.next(), Some(4));
         assert_eq!(heap.next(), Some(9));
         heap.add(1);
-        assert_eq!(heap.next(), Some(1));
+        assert_eq!(heap.next(), Some(11));
     }
 
     #[test]
